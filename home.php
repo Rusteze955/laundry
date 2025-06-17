@@ -1,9 +1,9 @@
-<?php 
+<?php
 include 'config/koneksi.php';
 session_start();
 ob_start();
-if(empty($_SESSION['NAME'])){
-    header("location:index.php?akses=ditolak");
+if (empty($_SESSION['NAME'])) {
+  header("location:index.php?akses=ditolak");
 }
 ?>
 <!DOCTYPE html>
@@ -13,7 +13,7 @@ if(empty($_SESSION['NAME'])){
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Components / Accordion - NiceAdmin Bootstrap Template</title>
+  <title>Laundry Abdullah | Home</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -49,24 +49,24 @@ if(empty($_SESSION['NAME'])){
 <body>
 
   <!-- ======= Header ======= -->
-   <?php include 'inc/header.php' ?>
- <!-- End Header -->
+  <?php include 'inc/header.php' ?>
+  <!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
-   <?php include 'inc/sidebar.php' ?>
+  <?php include 'inc/sidebar.php' ?>
   <!-- End Sidebar-->
 
   <main id="main" class="main">
 
-    <?php 
-    if (isset($_GET['page'])){
-        if (file_exists('content/' . $_GET['page'] . ".php")) {
-            include 'content/' . $_GET['page'] . ".php";
-        }else{
-            include 'content/notfound.php';
-        }
-    }else{
-        include 'content/dashboard.php';
+    <?php
+    if (isset($_GET['page'])) {
+      if (file_exists('content/' . $_GET['page'] . ".php")) {
+        include 'content/' . $_GET['page'] . ".php";
+      } else {
+        include 'content/notfound.php';
+      }
+    } else {
+      include 'content/dashboard.php';
     }
     ?>
 

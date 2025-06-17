@@ -1,22 +1,22 @@
-<?php 
-    include 'config/koneksi.php';
-    session_start();
-    if (isset($_POST['email'])){
-        $email = $_POST['email'];
-        $password = sha1($_POST['password']);
+<?php
+include 'config/koneksi.php';
+session_start();
+if (isset($_POST['email'])) {
+  $email = $_POST['email'];
+  $password = sha1($_POST['password']);
 
-        $query = mysqli_query($config, "SELECT * FROM user WHERE email='$email' AND password='$password'");
+  $query = mysqli_query($config, "SELECT * FROM user WHERE email='$email' AND password='$password'");
 
-        if (mysqli_num_rows($query) > 0){
-            $row = mysqli_fetch_assoc($query);
-            $_SESSION['NAME'] = $row['name'];
-            $_SESSION['ID_USER'] = $row['id'];
-            $_SESSION['ID_LEVEL'] = $row['id_level'];
-            header("location:home.php");
-        }else{
-            header("location:index.php?login=gagal");
-        }
-    }
+  if (mysqli_num_rows($query) > 0) {
+    $row = mysqli_fetch_assoc($query);
+    $_SESSION['NAME'] = $row['name'];
+    $_SESSION['ID_USER'] = $row['id'];
+    $_SESSION['ID_LEVEL'] = $row['id_level'];
+    header("location:home.php");
+  } else {
+    header("location:index.php?login=gagal");
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -121,6 +121,24 @@
 
     </div>
   </main><!-- End #main -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url('img/bg-laundry.jpg');
+      background-size: cover;
+      background-position: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .login-container {
+      width: 300px;
+      margin: 100px auto;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+    }
+  </style>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
