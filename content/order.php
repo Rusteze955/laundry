@@ -32,13 +32,13 @@ if (isset($_GET['delete'])) {
                             <tbody>
                                 <?php foreach ($rowOrder as $order): ?>
                                     <tr>
-                                        <td><a href="?page=tambah-order&detail=<?php echo $user['id'] ?>"><?php echo $order['order_code'] ?></a></td>
+                                        <td><a href="?page=tambah-order&detail=<?php echo $order['id'] ?>"><?php echo $order['order_code'] ?></a></td>
                                         <td><?php echo $order['customer_name'] ?></td>
                                         <td><?php echo $order['order_date'] ?></td>
                                         <td><?php echo $order['order_status'] ?></td>
                                         <td>
-                                            <a href="?page=tambah-order&edit=<?php echo $user['id'] ?>" class="btn btn-warning">Edit</a>
-                                            <a href="?page=order&delete=<?php echo $user['id'] ?>" class="btn btn-danger">Delete</a>
+                                            <a href="?page=tambah-order&edit=<?php echo $order['id'] ?>" class="btn btn-warning">Edit</a>
+                                            <a href="?page=order&delete=<?php echo $order['id'] ?>" class="btn btn-danger">Delete</a>
                                         </td>
                                     </tr>
                                 <?php endforeach ?>

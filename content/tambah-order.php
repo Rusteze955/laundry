@@ -5,21 +5,23 @@ if (isset($_GET['edit'])) {
     $row = mysqli_fetch_assoc($query);
 
     if (isset($_POST['save'])) {
-        $name = $_POST['customer_name'];
-        $phone = $_POST['phone'];
-        $address = $_POST['address'];
+        $id_customer = $_POST['id_customer'];
+        $order_code = $_POST['order_code'];
+        $order_status = $_POST['order_status'];
+        $order_date = $_POST['order_date'];
 
-        mysqli_query($config, "UPDATE customer SET customer_name='$name', phone='$phone', address='$address' WHERE id='$edit'");
-        header("location:?page=customer&ubah=berhasil");
+        mysqli_query($config, "UPDATE trans_order SET id_customer='$id_customer', order_code='$order_code', order_status='$order_status', order_date='$order_date' WHERE id='$edit'");
+        header("location:?page=order&ubah=berhasil");
     }
 } else {
     if (isset($_POST['save'])) {
-        $name = $_POST['customer_name'];
-        $phone = $_POST['phone'];
-        $address = $_POST['address'];
+        $id_customer = $_POST['id_customer'];
+        $order_code = $_POST['order_code'];
+        $order_status = $_POST['order_status'];
+        $order_date = $_POST['order_date'];
 
-        mysqli_query($config, "INSERT INTO customer (customer_name, phone, address) VALUES ('$name', '$phone', '$address')");
-        header("location:?page=customer&tambah=berhasil");
+        mysqli_query($config, "INSERT INTO trans_order (id_customer, order_code, order_status, order_date) VALUES ('$id_customer', '$order_code', '$order_status', '$order_date')");
+        header("location:?page=order&tambah=berhasil");
     }
 }
 
@@ -33,6 +35,9 @@ if (mysqli_num_rows($queryOrder) == 0) {
 
 $queryCustomer = mysqli_query($config, "SELECT * FROM customer ORDER BY id DESC");
 $rowCustomer = mysqli_fetch_all($queryCustomer, MYSQLI_ASSOC);
+
+$queryService = mysqli_query($config, "SELECT * FROM type_of_service ORDER BY id DESC");
+$rowService = mysqli_fetch_all($queryService, MYSQLI_ASSOC);
 
 ?>
 <section class="section">
@@ -50,7 +55,7 @@ $rowCustomer = mysqli_fetch_all($queryCustomer, MYSQLI_ASSOC);
                                 </div>
                                 <div class="mb-3">
                                     <label for="" class="form-label">Name</label>
-                                    <select name="customer_name" id="" class="form-control">
+                                    <select name="id_customer" id="" class="form-control">
                                         <option value="">Select Customer</option>
                                         <?php foreach ($rowCustomer as $customer): ?>
                                             <option <?php echo isset($_GET['edit']) ? ($customer['id'] == $row['id_customer'] ? 'selected' : '') : '' ?> value="<?php echo $customer['id'] ?>"><?php echo $customer['customer_name'] ?></option>
@@ -84,7 +89,7 @@ $rowCustomer = mysqli_fetch_all($queryCustomer, MYSQLI_ASSOC);
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Product</th>
+                                    <th>Service</th>
                                     <th>Qty</th>
                                     <th>Total</th>
                                     <th></th>
@@ -103,47 +108,86 @@ $rowCustomer = mysqli_fetch_all($queryCustomer, MYSQLI_ASSOC);
 </section>
 
 <script>
-    // var, let, const
-    // var : ketika nilainya tidak ada, maka tidak ada error
-    // let : harus mempunyai nilai
-    // const :isi nya tidak boleh berubah
-    // const button = document.getElementById('addRow');
-    // const button = document.getElementsByClassName('addRow');
-    const button = document.querySelector('.addRow');
-    const tbody = document.querySelector('#myTable tbody');
-    // button.textContent = "duar";
-    // button.style.color = "red";
+//ambil data service di php
+const services = <?= json_encode($rowService) ?>;
 
-    let no = 1;
-    button.addEventListener("click", function() {
-        // alert('Duar');
-        const tr = document.createElement('tr'); //<tr></tr>
-        tr.innerHTML = `
-        <td>${no}</td>
-        <td><input type='hidden' name='id_product[]'></td>
-        <td><input type='number' name='qty[]' value='0'></td>
-        <td><input type='hidden' name='total[]'></td>
-        <td><button class='btn btn-danger btn-sm removeRow' type='button'>Delete</button></td>`;
+//ambil input si addrow 
 
-        tbody.appendChild(tr);
-        no++;
-    });
-
-    tbody.addEventListener('click', function(e) {
-        if (e.target.classList.contains('removeRow')) {
-            e.target.closest("tr").remove();
+function numberRow() {
+    const rows = document.querySelectorAll('#myTable tbody tr');
+    rows.forEach((row, index) => {
+        const numberCell = row.querySelector('.row-number');
+        if (numberCell) {
+            numberCell.textContent = index + 1;
         }
+    });
+}
 
-        updateNumber()
+document.getElementById('addRow').addEventListener('click', function() {
+    const tbody = document.querySelector('#myTable tbody');
+    const row = document.createElement('tr');
 
+    let serviceOptions = '<option value="">-- Pilih Service --</option>';
+    services.forEach(service => {
+        serviceOptions += `<option value="${service.id}" data-price="${service.price}">
+                ${service.service_name}
+            </option>`;
     });
 
-    function updateNumber() {
-        const rows = tbody.querySelectorAll('tr');
-        rows.forEach(function(row, index) {
-            row.cells[0].textContent = index + 1;
-        });
+    row.innerHTML = `
+        <td class="row-number"></td>
+        <td>
+            <select name="id_service[]" class="form-control service-select" required>
+                ${serviceOptions}
+            </select>
+        </td>
+        <td><input type="number" name="qty[]" class="form-control qty" value="1" min="1"></td>
+        <td><input type="number" name="harga[]" class="form-control harga" readonly></td>
+        <td><input type="number" name="total[]" class="form-control total" readonly></td>
+        <td><button type="button" class="btn btn-danger btn-sm deleteRow">X</button></td>
+    `;
 
-        no = rows.length + 1;
-    }
+    tbody.appendChild(row);
+    newRow(row); // <-- Kirim baris yang baru ditambahkan
+    numberRow(row); //nambah si No 
+});
+
+function hitungTotal() {
+    const totalFields = document.querySelectorAll('.total');
+    let grand = 0;
+    totalFields.forEach(field => {
+        grand += parseFloat(field.value || 0);
+    });
+    document.getElementById('grandTotal').innerText = grand.toLocaleString();
+}
+
+function newRow(row) {
+    const select = row.querySelector('.service-select');
+    const qty = row.querySelector('.qty');
+    const harga = row.querySelector('.harga');
+    const total = row.querySelector('.total');
+    const deleteBtn = row.querySelector('.deleteRow');
+
+
+    select.addEventListener('change', function() {
+        const price = this.options[this.selectedIndex].getAttribute('data-price');
+        harga.value = price || 0;
+        total.value = (qty.value || 0) * (price || 0)
+        y
+        hitungTotal();
+    });
+
+    qty.addEventListener('input', function() {
+        const price = parseFloat(harga.value) || 0;
+        const quantity = parseFloat(qty.value) || 0;
+        total.value = quantity * price;
+        hitungTotal();
+    });
+
+    deleteBtn.addEventListener('click', function() {
+        row.remove();
+        hitungTotal();
+        numberRow(); // hapus si no yang ditambah lewat numberRow()
+    });;
+}
 </script>
