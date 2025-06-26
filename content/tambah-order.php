@@ -1,4 +1,8 @@
 <?php
+if (strtolower($rowLevel['level_name']) == 'leader') {
+    header("location:home.php?access=denied");
+    exit;
+}
 function tanggal($date)
 {
     $waktu = strtotime($date);
@@ -30,7 +34,7 @@ if (isset($_POST['save'])) {
             $qty = $_POST['qty'][$i] * 1000;
             $queryService = mysqli_query($config, "SELECT * FROM type_of_service WHERE id = '$id_service'");
             $rowService = mysqli_fetch_assoc($queryService);
-            $subtotal = $_POST['qty'][$i] = $rowService['price'];
+            $subtotal = $_POST['qty'][$i] * $rowService['price'];
             mysqli_query($config, "INSERT INTO trans_order_detail (id_order, id_service, qty, subtotal) VALUES('$id_order', '$id_service', '$qty', '$subtotal')");
         }
         header("location:?page=order&tambah=berhasil");
@@ -64,7 +68,7 @@ $date = date("dmy");
 $icrement_number = sprintf("%03s", $id_trans);
 $orderCode = $format_no . "-" . $date . "-" . $icrement_number;
 
-$queryCustomer = mysqli_query($config, "SELECT * FROM customer ORDER BY id DESC");
+$queryCustomer = mysqli_query($config, "SELECT * FROM customer WHERE deleted_at IS NULL ORDER BY id DESC");
 $rowCustomer = mysqli_fetch_all($queryCustomer, MYSQLI_ASSOC);
 
 if (isset($_GET['id_customer'])) {

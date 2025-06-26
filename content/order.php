@@ -1,11 +1,15 @@
 <?php
-$queryOrder = mysqli_query($config, "SELECT trans_order.*, customer.customer_name FROM trans_order LEFT JOIN customer ON trans_order.id_customer = customer.id ORDER BY id DESC");
+if (strtolower($rowLevel['level_name']) == 'leader') {
+    header("location:home.php?access=denied");
+    exit;
+}
+$queryOrder = mysqli_query($config, "SELECT trans_order.*, customer.customer_name FROM trans_order LEFT JOIN customer ON trans_order.id_customer = customer.id WHERE trans_order.deleted_at IS NULL ORDER BY id DESC");
 $rowOrder = mysqli_fetch_all($queryOrder, MYSQLI_ASSOC);
 
 if (isset($_GET['delete'])) {
     $id_user = $_GET['delete'];
     $now = date('Y-m-d H:i:s');
-    mysqli_query($config, "UPDATE customer SET deleted_at = '$now' WHERE id='$id_user'");
+    mysqli_query($config, "UPDATE trans_order SET deleted_at = '$now' WHERE id='$id_user'");
     header("location:?page=order&hapus=berhasil");
 }
 ?>
@@ -35,7 +39,7 @@ if (isset($_GET['delete'])) {
                                         <td><a href="?page=tambah-order&detail=<?php echo $order['id'] ?>"><?php echo $order['order_code'] ?></a></td>
                                         <td><?php echo $order['customer_name'] ?></td>
                                         <td><?php echo $order['order_date'] ?></td>
-                                        <td><?php echo $order['order_status'] ?></td>
+                                        <td><?php echo $order['order_status'] == 0 ? 'Process' : 'Pickup' ?></td>
                                         <td>
                                             <a href="print.php?id=<?php echo $order['id'] ?>" class="btn btn-warning">Print</a>
                                             <a href="?page=order&delete=<?php echo $order['id'] ?>" class="btn btn-danger">Delete</a>

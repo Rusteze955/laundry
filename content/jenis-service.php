@@ -1,4 +1,8 @@
 <?php
+if (strtolower($rowLevel['level_name']) == 'leader') {
+    header("location:home.php?access=denied");
+    exit;
+}
 $queryCustomer = mysqli_query($config, "SELECT * FROM type_of_service WHERE deleted_at IS NULL ORDER BY id DESC");
 $rowCustomer = mysqli_fetch_all($queryCustomer, MYSQLI_ASSOC);
 
@@ -6,7 +10,7 @@ if (isset($_GET['delete'])) {
     $id_customer = $_GET['delete'];
     $now = date('Y-m-d H:i:s');
     mysqli_query($config, "UPDATE type_of_service SET deleted_at = '$now' WHERE id='$id_customer'");
-    header("location:?page=customer&hapus=berhasil");
+    header("location:?page=jenis-service&hapus=berhasil");
 }
 ?>
 <section class="section">

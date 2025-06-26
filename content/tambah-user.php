@@ -1,4 +1,8 @@
 <?php
+if (strtolower($rowLevel['level_name']) != 'administrator') {
+    header("location:home.php?access=denied");
+    exit;
+}
 if (isset($_GET['edit'])) {
     $edit = $_GET['edit'];
     $query = mysqli_query($config, "SELECT * FROM user WHERE id='$edit'");

@@ -1,4 +1,8 @@
 <?php
+if (strtolower($rowLevel['level_name']) == 'leader' || strtolower($rowLevel['level_name']) == 'operator') {
+    header("location:home.php?access=denied");
+    exit;
+}
 if (isset($_GET['edit'])) {
     $edit = $_GET['edit'];
     $query = mysqli_query($config, "SELECT * FROM type_of_service WHERE id='$edit'");

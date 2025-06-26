@@ -1,4 +1,8 @@
 <?php
+if (strtolower($rowLevel['level_name']) != 'administrator') {
+    header("location:home.php?access=denied");
+    exit;
+}
 $queryUser = mysqli_query($config, "SELECT user.*, level_name FROM user LEFT JOIN level ON user.id_level = level.id ORDER BY user.id DESC");
 $rowUser = mysqli_fetch_all($queryUser, MYSQLI_ASSOC);
 
